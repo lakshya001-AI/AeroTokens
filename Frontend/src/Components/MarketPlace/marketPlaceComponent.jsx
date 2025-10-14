@@ -17,8 +17,16 @@ const MarketPlaceComponent = ({ aircraftDetails }) => {
   };
 
   const openBuyModal = (aircraft) => {
+    const isWalletConnected = sessionStorage.getItem("walletConnected");
+    const walletAddress = sessionStorage.getItem("walletAddress");
+
+    if (!isWalletConnected || !walletAddress) {
+      showErrorToast("Please connect your wallet to proceed with the purchase.");
+      return;
+    }
+
     setSelectedAircraft(aircraft);
-    setBuyData({ tokens: '', name: '', wallet: '' });
+    setBuyData({ tokens: '', name: '', wallet: walletAddress });
     setShowBuyModal(true);
   };
 
@@ -188,69 +196,96 @@ const MarketPlaceComponent = ({ aircraftDetails }) => {
         )}
 
         {/* Buy Tokens Modal */}
-        {showBuyModal && selectedAircraft && (
-          <motion.div
-            className="fixed inset-0 backdrop-blur-md bg-white/30 flex flex-col items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        <AnimatePresence>
+          {showBuyModal && selectedAircraft && (
             <motion.div
-              className="bg-white rounded-2xl p-6 w-11/12 md:w-2/3 lg:w-1/2 relative"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              className="fixed inset-0 backdrop-blur-md bg-white/30 flex flex-col items-center justify-center z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold"
-                onClick={() => setShowBuyModal(false)}
+              <motion.div
+                className="relative w-11/12 md:w-2/3 lg:w-1/3 bg-white/40 backdrop-blur-2xl border border-white/30 shadow-2xl rounded-2xl p-10"
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.85, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 280, damping: 20 }}
               >
-                X
-              </button>
-              <h2 className="text-2xl font-bold mb-4">Buy Tokens - {selectedAircraft.aircraftName}</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block font-medium mb-1">Number of Tokens</label>
-                  <input
-                    type="number"
-                    value={buyData.tokens}
-                    onChange={(e) => setBuyData({ ...buyData, tokens: e.target.value })}
-                    className="w-full border rounded-md p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={buyData.name}
-                    onChange={(e) => setBuyData({ ...buyData, name: e.target.value })}
-                    className="w-full border rounded-md p-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-1">Wallet Address</label>
-                  <input
-                    type="text"
-                    value={buyData.wallet}
-                    onChange={(e) => setBuyData({ ...buyData, wallet: e.target.value })}
-                    className="w-full border rounded-md p-2"
-                  />
-                </div>
-
+                {/* Close Button */}
                 <button
-                  className="w-full bg-[#0a66ff] text-white font-semibold py-2 rounded-md hover:bg-[#0044cc] transition"
-                  onClick={handleBuySubmit}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform text-lg font-semibold mb-1.5"
+                  onClick={() => setShowBuyModal(false)}
                 >
-                  Proceed
+                  ✕
                 </button>
-              </div>
+
+                {/* Title */}
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center mt-6.5">
+                  Buy Tokens – <span className="text-[#0a66ff]">{selectedAircraft.aircraftName}</span>
+                </h2>
+
+                {/* Form */}
+                <div className="space-y-5">
+                  {/* Token Input */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Number of Tokens
+                    </label>
+                    <input
+                      type="number"
+                      value={buyData.tokens}
+                      onChange={(e) => setBuyData({ ...buyData, tokens: e.target.value })}
+                      placeholder="Enter tokens..."
+                      className="w-full px-4 py-4 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-1 transition"
+                    />
+                  </div>
+
+                  {/* Name Input */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={buyData.name}
+                      onChange={(e) => setBuyData({ ...buyData, name: e.target.value })}
+                      placeholder="Enter your name..."
+                      className="w-full px-4 py-4 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-1 transition"
+                    />
+                  </div>
+
+                  {/* Wallet Input */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Wallet Address
+                    </label>
+                    <input
+                      type="text"
+                      value={buyData.wallet}
+                      onChange={(e) => setBuyData({ ...buyData, wallet: e.target.value })}
+                      placeholder="Enter your wallet address..."
+                      className="w-full px-4 py-4 rounded-xl border border-gray-300 bg-white/70 focus:outline-none focus:ring-1 transition"
+                    />
+                  </div>
+
+                  {/* Action Button */}
+                  <motion.button
+                    className="w-full py-3 mt-4 rounded-xl bg-gradient-to-r from-[#0a66ff] to-[#0044cc] text-white font-semibold text-lg shadow-md hover:shadow-lg transition-all"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleBuySubmit}
+                  >
+                    Proceed to Purchase
+                  </motion.button>
+                </div>
+
+                {/* Decorative Bottom Glow */}
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-2/3 h-2 bg-gradient-to-r from-[#0a66ff] to-[#0044cc] blur-xl opacity-40 rounded-full"></div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
+
       </AnimatePresence>
     </div>
   );

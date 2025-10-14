@@ -1,9 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWallet } from "@fortawesome/free-solid-svg-icons";
+import ToastMessage, { showErrorToast, showSuccessToast } from '../ToastMessage/toastMessage';
 
 const Navbar = () => {
+  const [walletConnected, setWalletConnected] = useState(sessionStorage.getItem("walletConnected") === "true");
+  // const handleConnectWallet = () => {
+  //   showSuccessToast("Wallet connected successfully!");
+  //   sessionStorage.setItem("walletConnected", "true");
+  //   setWalletConnected(true);
+  // }
+  const handleConnectWallet = async () => {
+    if (!window.ethereum) {
+      showErrorToast("MetaMask is not installed!");
+      return;
+    }
+
+    try {
+      // Request wallet connection
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      const account = accounts[0];
+
+      // Define QIE testnet parameters
+      const qieNetwork = {
+        chainId: "1983", // 1983 in hexadecimal
+        chainName: "QIE Testnet",
+        nativeCurrency: {
+          name: "QIE",
+          symbol: "QIE",
+          decimals: 18,
+        },
+        rpcUrls: ["https://rpc1testnet.qie.digital", "https://testnetqierpc1.digital/"],
+        blockExplorerUrls: ["https://testnet.qie.digital/"],
+      };
+
+      // Try switching to QIE testnet
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: qieNetwork.chainId }],
+      }).catch(async (switchError) => {
+        // If the chain is not added, add it
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [qieNetwork],
+          });
+        } else {
+          throw switchError;
+        }
+      });
+
+      showSuccessToast(`QIE Wallet connected`);
+      sessionStorage.setItem("walletConnected", "true");
+      sessionStorage.setItem("walletAddress", account);
+    } catch (error) {
+      console.error(error);
+      showErrorToast("Failed to connect wallet!");
+    }
+  };
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-13 py-5 bg-white shadow-md">
       {/* Logo Section */}
@@ -44,9 +102,9 @@ const Navbar = () => {
 
       {/* Wallet Button */}
       <div>
-        <button className="flex items-center bg-[#0a66ff] text-white font-medium px-4 py-2 rounded hover:bg-blue-700 transition cursor-pointer">
+        <button className="flex items-center bg-[#0a66ff] text-white font-medium px-4 py-2 rounded hover:bg-blue-700 transition cursor-pointer" onClick={handleConnectWallet}>
           <FontAwesomeIcon icon={faWallet} className="mr-2" />
-          Connect Wallet
+          {walletConnected ? "Wallet Connected" : "Connect Wallet"}
         </button>
       </div>
     </nav>
