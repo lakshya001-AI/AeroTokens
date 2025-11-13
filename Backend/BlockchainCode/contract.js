@@ -1,11 +1,11 @@
 const Web3 = require("web3");
 
 // QIE Testnet RPC (recommended)
-const provider = "https://rpc1testnet.qie.digital";  
+const provider = `${process.env.PROVIDER_URL}`;  
 const web3 = new Web3(provider);
 
 // Replace with your deployed contract address
-const contractAddress = "0x0C26102740528076789A4074B8F0ccc3AcEC40bD";
+const contractAddress = `${process.env.CONTRACT_ADDRESS}`;
 
 // Contract ABI
 const abi = [
@@ -128,12 +128,12 @@ const abi = [
 // Contract instance
 const contract = new web3.eth.Contract(abi, contractAddress);
 
-const privateKey = "428a186c58828edf6fb4b472ed7f51f7f6a910dfdb0f4e6214f9a71ae8d3a6e0";
+const privateKey = `${process.env.PRIVATE_KEY}`;
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
 web3.eth.accounts.wallet.add(account);
 
 (async () => {
-  const code = await web3.eth.getCode("0x0C26102740528076789A4074B8F0ccc3AcEC40bD");
+  const code = await web3.eth.getCode(contractAddress);
   console.log("Contract Code:", code);
 })();
 
