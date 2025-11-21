@@ -1,6 +1,6 @@
 # AeroTokens - Tokenizing Aircraft Ownership on QIE Blockchain
 
-![AeroToken](https://drive.google.com/file/d/1D2NqPGUnH0szLclrj24i63nT517QTQ93/view?usp=sharing)
+![AeroToken](https://github.com/lakshya001-AI/AeroTokens/blob/main/Black%20and%20Blue%20Dark%20ProfessionalBusiness%20Services%20LinkedIn%20Article%20Cover%20Image.png?raw=true)
 
 Bringing real-world aviation assets to the blockchain economy. AeroTokens is a revolutionary blockchain-powered platform that democratizes aircraft ownership through fractional tokenization, enabling investors worldwide to participate in the aviation industry with unprecedented accessibility.
 
